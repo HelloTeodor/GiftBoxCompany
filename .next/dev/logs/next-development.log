@@ -30,3 +30,6 @@
 {"timestamp":"00:00:07.820","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600\\\" has \\\"fill\\\" but is missing \\\"sizes\\\" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes\\u001b[39m\""}
 {"timestamp":"00:00:07.820","source":"Browser","level":"WARN","message":"\u001b[33mImage with src \"https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600\" has \"fill\" but is missing \"sizes\" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes\u001b[39m"}
 {"timestamp":"00:00:28.611","source":"Server","level":"LOG","message":"✓ Compiled in 572ms"}
+{"timestamp":"00:05:23.885","source":"Server","level":"LOG","message":"prisma:error \"Error in PostgreSQL connection: Error { kind: Closed, cause: None }\""}
+{"timestamp":"00:05:23.885","source":"Server","level":"LOG","message":"prisma:error \"Error in PostgreSQL connection: Error { kind: Closed, cause: None }\""}
+{"timestamp":"00:05:23.885","source":"Server","level":"LOG","message":"prisma:error \"Error in PostgreSQL connection: Error { kind: Closed, cause: None }\""}
