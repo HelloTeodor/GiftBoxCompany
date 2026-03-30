@@ -5,16 +5,19 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Analytics | Admin' };
 
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 async function getAnalyticsData() {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
   const [
     revenueThisMonth, revenueLastMonth,
     ordersThisMonth, ordersLastMonth,
     topProducts, topCategories,
-    conversionData
+    conversionData, revenueOrders,
   ] = await Promise.all([
     prisma.order.aggregate({ where: { paymentStatus: 'PAID', createdAt: { gte: thirtyDaysAgo } }, _sum: { total: true }, _count: true, _avg: { total: true } }),
     prisma.order.aggregate({ where: { paymentStatus: 'PAID', createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } }, _sum: { total: true }, _count: true, _avg: { total: true } }),
@@ -36,9 +39,24 @@ async function getAnalyticsData() {
       _count: true,
       where: { createdAt: { gte: thirtyDaysAgo } },
     }),
+    prisma.order.findMany({
+      where: { paymentStatus: 'PAID', createdAt: { gte: twelveMonthsAgo } },
+      select: { total: true, createdAt: true },
+    }),
   ]);
 
-  return { revenueThisMonth, revenueLastMonth, ordersThisMonth, ordersLastMonth, topProducts, topCategories, conversionData };
+  const revenueMap: Record<string, number> = {};
+  for (const order of revenueOrders) {
+    const key = `${order.createdAt.getFullYear()}-${order.createdAt.getMonth()}`;
+    revenueMap[key] = (revenueMap[key] || 0) + Number(order.total);
+  }
+  const revenueChartData = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    return { month: MONTH_LABELS[d.getMonth()], revenue: Math.round((revenueMap[key] || 0) * 100) / 100 };
+  });
+
+  return { revenueThisMonth, revenueLastMonth, ordersThisMonth, ordersLastMonth, topProducts, topCategories, conversionData, revenueChartData };
 }
 
 export default async function AdminAnalyticsPage() {
@@ -86,7 +104,7 @@ export default async function AdminAnalyticsPage() {
       {/* Revenue Chart */}
       <div className="bg-white rounded-2xl p-6 shadow-card">
         <h2 className="font-serif text-xl font-bold text-gray-900 mb-6">Revenue Trend</h2>
-        <AdminRevenueChart />
+        <AdminRevenueChart data={data.revenueChartData} />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

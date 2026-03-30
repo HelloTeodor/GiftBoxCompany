@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Plus, Tag } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { AdminCouponActions } from '@/components/admin/AdminCouponActions';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Coupons | Admin' };
@@ -31,6 +32,7 @@ export default async function AdminCouponsPage() {
               <th className="text-left px-5 py-3">Uses</th>
               <th className="text-left px-5 py-3">Expires</th>
               <th className="text-left px-5 py-3">Status</th>
+              <th className="text-right px-5 py-3">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -45,7 +47,7 @@ export default async function AdminCouponsPage() {
                 </td>
                 <td className="px-5 py-4 text-sm text-gray-600">{c.type}</td>
                 <td className="px-5 py-4 text-sm font-semibold text-gray-900">
-                  {c.type === 'PERCENTAGE' ? `${c.value}%` : `€${c.value}`}
+                  {c.type === 'PERCENTAGE' ? `${c.value}%` : c.type === 'FREE_SHIPPING' ? 'Free' : `€${c.value}`}
                 </td>
                 <td className="px-5 py-4 text-sm text-gray-600">
                   {c.usageCount}{c.usageLimit ? ` / ${c.usageLimit}` : ''}
@@ -58,8 +60,19 @@ export default async function AdminCouponsPage() {
                     {c.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
+                <td className="px-5 py-4">
+                  <AdminCouponActions couponId={c.id} />
+                </td>
               </tr>
             ))}
+            {coupons.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-5 py-12 text-center text-gray-400 text-sm">
+                  No coupons yet.{' '}
+                  <Link href="/admin/coupons/new" className="text-gold-600 hover:underline">Create one</Link>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

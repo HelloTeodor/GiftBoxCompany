@@ -11,17 +11,10 @@ interface Testimonial {
   user: { name?: string | null; avatar?: string | null };
 }
 
-const fallbackTestimonials = [
-  { id: '1', rating: 5, title: 'Absolutely stunning!', body: "I ordered the Executive Welcome Box for our new hires and the team was blown away. The packaging is incredibly premium and every product inside is high quality. Will definitely be ordering again!", user: { name: 'Sarah M.', avatar: null } },
-  { id: '2', rating: 5, title: 'Perfect Christmas gift', body: "Ordered the Christmas Luxury Box for my whole family. Everyone loved it. The presentation was beautiful and the products were premium quality. Giftora made my holiday shopping stress-free!", user: { name: 'James O.', avatar: null } },
-  { id: '3', rating: 5, title: 'Made our client feel special', body: "We sent the Corporate Prestige Box to our top client as a year-end gift. They called us specifically to say how impressed they were. Worth every cent for the impression it created.", user: { name: 'Emma K.', avatar: null } },
-  { id: '4', rating: 5, title: 'Perfect for new moms', body: "Gifted the Newborn Box to my sister and she cried happy tears. The quality and care that went into the selection was evident. The note card made it extra personal.", user: { name: 'Aoife B.', avatar: null } },
-  { id: '5', rating: 5, title: 'Luxury at its finest', body: "The Self-Care Ritual Box was genuinely luxurious. Everything felt premium, the bath salts were amazing, the candle smells divine. I ended up ordering one for myself too!", user: { name: 'Laura T.', avatar: null } },
-  { id: '6', rating: 5, title: 'Fast delivery, beautiful box', body: "Ordered a Birthday Bliss Box with 2-day shipping and it arrived perfectly packaged. My friend said it was the best birthday gift she'd ever received. Giftora exceeded expectations!", user: { name: 'Conor R.', avatar: null } },
-];
-
 export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
-  const items = testimonials.length >= 3 ? testimonials : fallbackTestimonials;
+  if (testimonials.length === 0) return null;
+
+  const avgRating = testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length;
 
   return (
     <section className="py-16 lg:py-24 bg-cream-50">
@@ -37,13 +30,13 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
                 <Star key={i} size={18} className="text-gold-500 fill-gold-500" />
               ))}
             </div>
-            <span className="text-navy-700 font-semibold">4.9 out of 5</span>
-            <span className="text-cream-500 text-sm">· 10,000+ reviews</span>
+            <span className="text-navy-700 font-semibold">{avgRating.toFixed(1)} out of 5</span>
+            <span className="text-cream-500 text-sm">· {testimonials.length} review{testimonials.length !== 1 ? 's' : ''}</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.slice(0, 6).map((t) => (
+          {testimonials.slice(0, 6).map((t) => (
             <div key={t.id} className="card-premium p-6 relative">
               <Quote size={24} className="text-gold-200 absolute top-4 right-4" />
               <div className="flex mb-3">

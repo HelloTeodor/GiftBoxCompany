@@ -11,19 +11,20 @@ export const metadata: Metadata = { title: 'Products | Admin' };
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: { q?: string; status?: string; page?: string };
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
-  const page = Number(searchParams.page) || 1;
+  const sp = await searchParams;
+  const page = Number(sp.page) || 1;
   const perPage = 20;
 
   const where: Record<string, unknown> = {
-    ...(searchParams.q && {
+    ...(sp.q && {
       OR: [
-        { name: { contains: searchParams.q, mode: 'insensitive' } },
-        { sku: { contains: searchParams.q, mode: 'insensitive' } },
+        { name: { contains: sp.q, mode: 'insensitive' } },
+        { sku: { contains: sp.q, mode: 'insensitive' } },
       ],
     }),
-    ...(searchParams.status && searchParams.status !== 'ALL' && { status: searchParams.status }),
+    ...(sp.status && sp.status !== 'ALL' && { status: sp.status }),
   };
 
   const [products, total] = await Promise.all([
@@ -62,7 +63,7 @@ export default async function AdminProductsPage({
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             name="q"
-            defaultValue={searchParams.q}
+            defaultValue={sp.q}
             placeholder="Search products, SKUs..."
             className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-400"
           />
@@ -73,7 +74,7 @@ export default async function AdminProductsPage({
               key={s}
               href={`/admin/products?status=${s}`}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                (searchParams.status || 'ALL') === s
+                (sp.status || 'ALL') === s
                   ? 'bg-navy-950 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
@@ -163,7 +164,7 @@ export default async function AdminProductsPage({
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <Link
                 key={p}
-                href={`/admin/products?page=${p}${searchParams.q ? `&q=${searchParams.q}` : ''}`}
+                href={`/admin/products?page=${p}${sp.q ? `&q=${sp.q}` : ''}`}
                 className={`w-9 h-9 rounded-lg text-sm font-medium flex items-center justify-center transition-all ${
                   page === p ? 'bg-navy-950 text-white' : 'border border-gray-200 text-gray-600 hover:border-gold-400'
                 }`}

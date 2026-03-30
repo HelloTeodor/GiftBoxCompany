@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { CheckCircle, Package, ArrowRight, Mail } from 'lucide-react';
 
-export default function CheckoutSuccessPage({
+export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string; order?: string };
+  searchParams: Promise<{ session_id?: string; order?: string }>;
 }) {
-  const orderNumber = searchParams.order || searchParams.session_id?.slice(-8).toUpperCase();
+  const sp = await searchParams;
+  const orderNumber = sp.order || sp.session_id?.slice(-8).toUpperCase();
 
   return (
     <div className="section-padding py-24 text-center">

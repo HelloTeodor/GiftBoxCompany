@@ -37,11 +37,21 @@ async function getTestimonials() {
   });
 }
 
+async function getHeroStats() {
+  const [customerCount, productCount, reviewStats] = await Promise.all([
+    prisma.user.count({ where: { role: 'CUSTOMER' } }),
+    prisma.product.count({ where: { status: 'ACTIVE' } }),
+    prisma.review.aggregate({ where: { status: 'APPROVED' }, _avg: { rating: true }, _count: true }),
+  ]);
+  return { customerCount, productCount, reviewStats };
+}
+
 export default async function HomePage() {
-  const [featuredProducts, categories, testimonials] = await Promise.all([
+  const [featuredProducts, categories, testimonials, heroStats] = await Promise.all([
     getFeaturedProducts(),
     getCategories(),
     getTestimonials(),
+    getHeroStats(),
   ]);
 
   // Serialize Decimal values
@@ -55,7 +65,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection />
+      <HeroSection stats={heroStats} />
       <CategoriesGrid categories={categories} />
       <Suspense fallback={<div className="h-96 animate-shimmer" />}>
         <FeaturedProducts products={serializedProducts} />

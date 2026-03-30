@@ -2,17 +2,28 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Gift, Star, Truck, Shield } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, Gift, Star, Truck } from 'lucide-react';
 
-const stats = [
-  { value: '10k+', label: 'Happy Customers' },
-  { value: '50+', label: 'Gift Collections' },
-  { value: '4.9★', label: 'Average Rating' },
-  { value: '2-day', label: 'Fast Delivery' },
-];
+interface HeroStats {
+  customerCount: number;
+  productCount: number;
+  reviewStats: { _avg: { rating: number | null }; _count: number };
+}
 
-export function HeroSection() {
+function formatCount(n: number): string {
+  if (n >= 1000) return `${Math.floor(n / 1000)}k+`;
+  return n > 0 ? `${n}+` : '0';
+}
+
+export function HeroSection({ stats }: { stats: HeroStats }) {
+  const avgRating = stats.reviewStats._avg.rating;
+  const heroStats = [
+    { value: formatCount(stats.customerCount), label: 'Happy Customers' },
+    { value: `${stats.productCount}+`, label: 'Gift Box Designs' },
+    ...(avgRating ? [{ value: `${avgRating.toFixed(1)}★`, label: 'Average Rating' }] : []),
+    { value: '2-day', label: 'Express Delivery' },
+  ];
+
   return (
     <section className="relative overflow-hidden bg-navy-gradient min-h-[85vh] flex items-center">
       {/* Background pattern */}
@@ -53,7 +64,7 @@ export function HeroSection() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-              {stats.map((stat) => (
+              {heroStats.map((stat) => (
                 <div key={stat.label}>
                   <p className="text-2xl font-bold text-gold-400 font-serif">{stat.value}</p>
                   <p className="text-cream-400 text-xs mt-0.5">{stat.label}</p>
@@ -85,23 +96,25 @@ export function HeroSection() {
                 />
               </div>
               {/* Floating card */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-premium p-4 w-48 z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center">
-                    <Star size={14} className="text-gold-600 fill-gold-600" />
+              {avgRating && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-premium p-4 w-48 z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center">
+                      <Star size={14} className="text-gold-600 fill-gold-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-navy-950">{avgRating.toFixed(1)} / 5</p>
+                      <p className="text-xs text-cream-500">{stats.reviewStats._count} review{stats.reviewStats._count !== 1 ? 's' : ''}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-navy-950">4.9 / 5</p>
-                    <p className="text-xs text-cream-500">10,000+ reviews</p>
+                  <div className="flex -space-x-2">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-gold-200 to-cream-300 border-2 border-white" />
+                    ))}
+                    <div className="w-7 h-7 rounded-full bg-navy-950 border-2 border-white flex items-center justify-center text-xs text-white font-bold">+</div>
                   </div>
                 </div>
-                <div className="flex -space-x-2">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-gold-200 to-cream-300 border-2 border-white" />
-                  ))}
-                  <div className="w-7 h-7 rounded-full bg-navy-950 border-2 border-white flex items-center justify-center text-xs text-white font-bold">+</div>
-                </div>
-              </div>
+              )}
               {/* Shipping badge */}
               <div className="absolute bottom-16 right-0 bg-navy-800 rounded-xl p-3 flex items-center gap-2 shadow-lg">
                 <Truck size={16} className="text-gold-400" />

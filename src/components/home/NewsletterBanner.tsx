@@ -13,7 +13,7 @@ export function NewsletterBanner() {
             Get 10% Off Your First Order
           </h2>
           <p className="text-cream-600 mb-8">
-            Join 50,000+ gift lovers. Get exclusive offers, new collection previews, and inspiring gifting ideas — straight to your inbox.
+            Be the first to hear about new collections, exclusive offers, and gifting inspiration — straight to your inbox.
           </p>
           <NewsletterForm />
           <p className="text-xs text-cream-400 mt-3">

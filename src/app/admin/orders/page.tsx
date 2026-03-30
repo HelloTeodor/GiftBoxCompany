@@ -9,18 +9,19 @@ export const metadata: Metadata = { title: 'Orders | Admin' };
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: { status?: string; q?: string; page?: string };
+  searchParams: Promise<{ status?: string; q?: string; page?: string }>;
 }) {
-  const page = Number(searchParams.page) || 1;
+  const sp = await searchParams;
+  const page = Number(sp.page) || 1;
   const perPage = 25;
 
   const where: Record<string, unknown> = {
-    ...(searchParams.status && searchParams.status !== 'ALL' && { status: searchParams.status }),
-    ...(searchParams.q && {
+    ...(sp.status && sp.status !== 'ALL' && { status: sp.status }),
+    ...(sp.q && {
       OR: [
-        { orderNumber: { contains: searchParams.q, mode: 'insensitive' } },
-        { guestEmail: { contains: searchParams.q, mode: 'insensitive' } },
-        { user: { email: { contains: searchParams.q, mode: 'insensitive' } } },
+        { orderNumber: { contains: sp.q, mode: 'insensitive' } },
+        { guestEmail: { contains: sp.q, mode: 'insensitive' } },
+        { user: { email: { contains: sp.q, mode: 'insensitive' } } },
       ],
     }),
   };
@@ -56,7 +57,7 @@ export default async function AdminOrdersPage({
               key={s}
               href={`/admin/orders?status=${s}`}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                (searchParams.status || 'ALL') === s ? 'bg-navy-950 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                (sp.status || 'ALL') === s ? 'bg-navy-950 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               {s}

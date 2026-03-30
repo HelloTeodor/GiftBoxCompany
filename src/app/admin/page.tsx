@@ -7,15 +7,20 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Admin Dashboard | Giftora' };
 
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 async function getDashboardData() {
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
+  // Last 12 months range for revenue chart
+  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+
   const [
     totalRevenue, lastMonthRevenue, totalOrders, pendingOrders,
-    totalCustomers, totalProducts, lowStockProducts, recentOrders
+    totalCustomers, totalProducts, lowStockProducts, recentOrders,
+    revenueOrders,
   ] = await Promise.all([
     prisma.order.aggregate({ where: { paymentStatus: 'PAID' }, _sum: { total: true } }),
     prisma.order.aggregate({ where: { paymentStatus: 'PAID', createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } }, _sum: { total: true } }),
@@ -34,7 +39,23 @@ async function getDashboardData() {
       orderBy: { createdAt: 'desc' },
       include: { items: { take: 1 } },
     }),
+    prisma.order.findMany({
+      where: { paymentStatus: 'PAID', createdAt: { gte: twelveMonthsAgo } },
+      select: { total: true, createdAt: true },
+    }),
   ]);
+
+  // Build 12-month revenue chart data
+  const revenueMap: Record<string, number> = {};
+  for (const order of revenueOrders) {
+    const key = `${order.createdAt.getFullYear()}-${order.createdAt.getMonth()}`;
+    revenueMap[key] = (revenueMap[key] || 0) + Number(order.total);
+  }
+  const revenueChartData = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    return { month: MONTH_LABELS[d.getMonth()], revenue: Math.round((revenueMap[key] || 0) * 100) / 100 };
+  });
 
   return {
     totalRevenue: Number(totalRevenue._sum.total || 0),
@@ -45,6 +66,7 @@ async function getDashboardData() {
     totalProducts,
     lowStockProducts,
     recentOrders,
+    revenueChartData,
   };
 }
 
@@ -126,7 +148,7 @@ export default async function AdminDashboardPage() {
             <h2 className="font-serif text-xl font-bold text-gray-900">Revenue Overview</h2>
             <Link href="/admin/analytics" className="text-sm text-gold-600 hover:underline">Full report →</Link>
           </div>
-          <AdminRevenueChart />
+          <AdminRevenueChart data={data.revenueChartData} />
         </div>
 
         {/* Low Stock Alert */}

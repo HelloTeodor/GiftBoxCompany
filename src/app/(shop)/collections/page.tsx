@@ -22,8 +22,14 @@ export default async function CollectionsPage() {
       </div>
       <div className="section-padding py-12">
         {collections.length === 0 ? (
-          <div className="text-center py-20 text-cream-400">
-            <p className="font-serif text-xl">Collections coming soon!</p>
+          <div className="text-center py-20">
+            <p className="font-serif text-2xl text-navy-950 mb-3">Collections coming soon</p>
+            <p className="text-cream-500 mb-8 max-w-sm mx-auto">
+              We&apos;re curating special collections for you. In the meantime, explore all our gift boxes.
+            </p>
+            <Link href="/products" className="btn-gold inline-flex items-center gap-2">
+              Shop All Gift Boxes <ArrowRight size={16} />
+            </Link>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
