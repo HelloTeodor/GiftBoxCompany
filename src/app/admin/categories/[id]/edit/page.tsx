@@ -8,11 +8,12 @@ import { CategoryForm } from '@/components/admin/CategoryForm';
 
 export const metadata = { title: 'Edit Category — Giftora Admin' };
 
-export default async function EditCategoryPage({ params }: { params: { id: string } }) {
+export default async function EditCategoryPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session || !isAdmin(session.user.role)) redirect('/login');
 
-  const category = await prisma.category.findUnique({ where: { id: params.id } });
+  const { id } = await params;
+  const category = await prisma.category.findUnique({ where: { id } });
   if (!category) notFound();
 
   return (

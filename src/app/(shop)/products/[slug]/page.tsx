@@ -58,6 +58,7 @@ export default async function ProductPage({ params }: Props) {
       ...v,
       price: v.price ? Number(v.price) : null,
       salePrice: v.salePrice ? Number(v.salePrice) : null,
+      options: (v.options ?? {}) as Record<string, string>,
     })),
   };
 

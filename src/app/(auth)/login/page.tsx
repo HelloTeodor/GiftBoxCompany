@@ -1,15 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, Chrome } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { Metadata } from 'next';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -17,7 +16,7 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
@@ -138,11 +137,19 @@ export default function LoginPage() {
       </form>
 
       <p className="text-center text-sm text-cream-500 mt-6">
-        Don't have an account?{' '}
+        {"Don't have an account? "}
         <Link href="/register" className="text-gold-600 font-medium hover:underline">
           Create one
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

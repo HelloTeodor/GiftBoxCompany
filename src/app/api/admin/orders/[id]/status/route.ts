@@ -4,9 +4,11 @@ import { isStaff } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
 import { sendShippingNotificationEmail } from '@/lib/email';
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session || !isStaff(session.user.role)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
 
   try {
     const { status, trackingNumber, trackingUrl, note } = await req.json();
@@ -21,14 +23,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     };
 
     const order = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: { user: true },
     });
 
     await prisma.orderStatusHistory.create({
       data: {
-        orderId: order.id,
+        orderId: id,
         status: status as any,
         note: note || null,
         createdBy: session.user.id,

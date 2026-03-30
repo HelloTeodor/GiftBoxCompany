@@ -25,9 +25,9 @@ export default function CheckoutSuccessPage({
         <div className="bg-cream-50 rounded-2xl p-6 mb-8 text-left space-y-4">
           <h3 className="font-serif font-semibold text-navy-950">What happens next?</h3>
           {[
-            { icon: Mail, step: '1', label: 'Check your email', desc: 'We've sent an order confirmation to your email address.' },
+            { icon: Mail, step: '1', label: 'Check your email', desc: "We've sent an order confirmation to your email address." },
             { icon: Package, step: '2', label: 'We pack your gift', desc: 'Your gift box will be carefully packed within 1–2 business days.' },
-            { icon: ArrowRight, step: '3', label: 'It's on its way!', desc: 'You'll receive a shipping notification with a tracking number.' },
+            { icon: ArrowRight, step: '3', label: "It's on its way!", desc: "You'll receive a shipping notification with a tracking number." },
           ].map(({ icon: Icon, step, label, desc }) => (
             <div key={step} className="flex items-start gap-3">
               <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">

@@ -3,17 +3,18 @@ import { auth } from '@/lib/auth';
 import { isStaff } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session || !isStaff(session.user.role)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const { id } = await params;
   const { status } = await req.json();
+
   const review = await prisma.review.update({
-    where: { id: params.id },
+    where: { id },
     data: { status },
   });
 
-  // Update product rating if approved/rejected
   if (status === 'APPROVED' || status === 'REJECTED') {
     const product = await prisma.review.aggregate({
       where: { productId: review.productId, status: 'APPROVED' },

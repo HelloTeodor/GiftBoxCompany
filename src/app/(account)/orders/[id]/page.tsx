@@ -8,10 +8,11 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Order Details' };
 
-export default async function OrderDetailPage({ params }: { params: { id: string } }) {
+export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
+  const { id } = await params;
   const order = await prisma.order.findFirst({
-    where: { id: params.id, userId: session!.user.id },
+    where: { id, userId: session!.user.id },
     include: {
       items: true,
       shippingAddress: true,

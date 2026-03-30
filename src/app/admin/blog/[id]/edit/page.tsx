@@ -8,11 +8,12 @@ import { BlogPostForm } from '@/components/admin/BlogPostForm';
 
 export const metadata = { title: 'Edit Post — Giftora Admin' };
 
-export default async function EditBlogPostPage({ params }: { params: { id: string } }) {
+export default async function EditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session || !isAdmin(session.user.role)) redirect('/login');
 
-  const post = await prisma.blogPost.findUnique({ where: { id: params.id } });
+  const { id } = await params;
+  const post = await prisma.blogPost.findUnique({ where: { id } });
   if (!post) notFound();
 
   return (

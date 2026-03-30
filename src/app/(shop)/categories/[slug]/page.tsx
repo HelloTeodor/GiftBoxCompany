@@ -5,15 +5,17 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const cat = await prisma.category.findUnique({ where: { slug: params.slug } });
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const cat = await prisma.category.findUnique({ where: { slug } });
   if (!cat) return { title: 'Category Not Found' };
   return { title: `${cat.name} Gift Boxes`, description: cat.description || undefined };
 }
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const category = await prisma.category.findUnique({
-    where: { slug: params.slug, isActive: true },
+    where: { slug, isActive: true },
   });
   if (!category) notFound();
 

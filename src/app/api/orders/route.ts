@@ -40,8 +40,8 @@ export async function GET(req: NextRequest) {
       giftCardAmount: Number(order.giftCardAmount),
       items: order.items.map((item) => ({
         ...item,
-        unitPrice: Number(item.unitPrice),
-        totalPrice: Number(item.totalPrice),
+        price: Number(item.price),
+        total: Number(item.total),
       })),
     }));
 

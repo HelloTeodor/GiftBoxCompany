@@ -80,7 +80,7 @@ export default async function SecurityPage() {
         <p className="text-sm text-gray-500 mb-6">
           {oauthProviders.length > 0
             ? 'You signed in with a social account. You can set a password to also enable email/password login.'
-            : 'Choose a strong password and don't reuse it for other accounts.'}
+            : "Choose a strong password and don't reuse it for other accounts."}
         </p>
         <ChangePasswordForm />
       </div>
