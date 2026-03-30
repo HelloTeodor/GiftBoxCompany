@@ -7,8 +7,11 @@ import type { Metadata } from 'next';
 interface Props { params: { slug: string } }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
+  const slug = params.slug.trim();
+  const product = await prisma.product.findFirst({
+    where: {
+      slug: { equals: slug, mode: 'insensitive' },
+    },
     select: { name: true, shortDesc: true, metaTitle: true, metaDesc: true },
   });
   if (!product) return { title: 'Product Not Found' };
@@ -19,8 +22,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug, status: 'ACTIVE' },
+  const slug = params.slug.trim();
+  const product = await prisma.product.findFirst({
+    where: {
+      slug: { equals: slug, mode: 'insensitive' },
+      status: 'ACTIVE',
+    },
     include: {
       images: { orderBy: { sortOrder: 'asc' } },
       category: true,

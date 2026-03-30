@@ -82,10 +82,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
     }
   };
 
+  const productUrl = `/products/${encodeURIComponent(product.slug)}`;
+
   return (
     <div className={cn('group relative card-premium overflow-hidden', className)}>
       {/* Image */}
-      <Link href={`/products/${product.slug}`} className="block relative overflow-hidden aspect-[4/3]">
+      <Link href={productUrl} className="block relative overflow-hidden aspect-[4/3]">
         {primaryImage ? (
           <Image
             src={primaryImage}
@@ -130,7 +132,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
             <Heart size={16} fill={wishlisted ? 'currentColor' : 'none'} />
           </button>
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/products/${product.slug}`); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(productUrl); }}
             className="w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center text-navy-600 hover:text-gold-600 transition-all hover:scale-110"
             aria-label="Quick view"
           >
@@ -161,7 +163,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         <p className="text-xs text-gold-600 font-medium mb-1 uppercase tracking-wide">
           {product.category.name}
         </p>
-        <Link href={`/products/${product.slug}`}>
+        <Link href={productUrl}>
           <h3 className="font-serif text-navy-950 font-semibold leading-tight mb-1 hover:text-gold-600 transition-colors line-clamp-2">
             {product.name}
           </h3>
